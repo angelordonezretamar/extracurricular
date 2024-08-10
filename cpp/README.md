@@ -1,1 +1,2 @@
-problems and solutions from hackerrank cpp
+cpp practice problems and solutions
+from hackerrank and leetcode
