@@ -1,0 +1,23 @@
+The most effective solutions consider and include the following:
+
+Simple class
+This question definitely points towards designing a simple class.
+
+Create an array with the specified number of mines at the beginning and use a random shuffle.
+
+If mines occupy more than half of the cells, randomize empty cells instead of mines.
+
+If for NxN you need M mines then:
+
+1) if M < NxN/2 then randomly pick spots and if empty place mines. At worst, the chance of picking a mine rather than empty cell is 50% so we need 2M tries.
+
+2) if M > NxN/2 try step 1 assuming that all cells are mined and we are trying to free up (NxN - M) spots. So in the extreme example above, it takes almost one try
+
+What is the right way to report a problem if the requested number of mines is larger than the number of available squares?
+
+Some other important learnings from this question:
+There are various ways to solve it. For the initialization, you might choose to place mines and increment neighbors in one loop, or place mines and then iterate over all fields and count the mines in the neighborhood.
+
+A common error is to struggle to see the structure of the problem and make gigantic if clauses when looking at neighboring fields, instead of writing a simple for loop.
+
+An important part of this question is figuring out a way to place the mines. The most naive implementation is to pick two random numbers (row and column) and place a mine there, but this will cause the board to have less mines than expected if the same coordinates are picked twice. Re-trying if the picked coordinates already have a mine fixes the immediate problem, but will take a very long time for cases such as a 100x100 board with 9999 mines.

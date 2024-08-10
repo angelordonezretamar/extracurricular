@@ -1,0 +1,54 @@
+There are a number of different viable approaches (for example, there’s more than one algorithm that applies). This means you can really put your problem-solving ability to the test and build on what you know.
+
+Some solutions:
+
+Brute force
+Generate all 2^n possible subsequences, and check each one against the dictionary for a match. A slight optimization is to at least ensure the dictionary is represented by a hash table or prefix tree so that lookups are efficient.
+
+Check each dictionary word using a greedy algorithm
+You can prove that a greedy algorithm works for checking if a word w is a subsequence of S. Scan S from the beginning for w[0]. After you find it, continue scanning from that point for w[1], and so on, until either you run out of characters in S (w is not a subsequence), or you find all the characters in w (w is a subsequence).
+
+You could sort the dictionary words in order of descending length, run the above decision procedure for each word, and take the first word that is a subsequence of S. The running time is O(N*W) where W is the number of words in D and N is the number of characters in S.
+
+O(N*W) is asymptotically optimal if most dictionary words are close to size N (because then the size of the input is O(N*W)). However, it is far from optimal in a worst-case scenario where S may be long and the dictionary strings quite short.
+
+Define L to be the total number of characters in the dictionary over all words. Then the best possible time complexity (assuming words shorter than S) is O(N + L). However, the existing algorithm is O(N * W), which might be O(N * L) in the case where dictionary words are a small constant in size.
+
+Improving the greedy approach
+Notice that to check a dictionary word w, you end up needing to know, for each character c in w, the least index i in S where S[i] == c, such that i is greater than some given index j (the index of the previously-matched letter). Observe that the greedy algorithm is slow precisely because it naively scans for this index i.
+
+You can preprocess S to find such indices much faster. Build a map of letter -> sorted list of indices where letter occurs. For example, if S == "abppplee":
+
+Copy
+a -> [0]
+b -> [1]
+p -> [2, 3, 4]
+l -> [5]
+e -> [6, 7]
+    
+When you need to know "Given my last matched character was at index X and my next character to match is Y, where does this match occur?", you would look up Y in the map, and then binary search the occurrence list to find the smallest number > X in that list, or report that none exists (the word is not a subsequence then).
+
+This approach requires one binary search per dictionary letter. Since it takes only O(N) time to preprocess S in this way, the total complexity is O(N + L * log N), which is quite close to the best possible complexity.
+
+Advanced approach: You might note that since this is a classic "successor-value" problem, specialized data structures exist that can run the search even faster. A vEB tree, for example, improves the runtime to O(N + L * log log N).
+
+An optimal O(N + L) approach for small alphabets
+If the size of the alphabet is a-z or a small constant, we can give a solution based off the previous idea that runs in O(N + L).
+
+The real complexity is O(N*A + L), where A is the size of the alphabet. Instead of making the representation sparse, you could make it dense. Instead of p -> [2, 3, 4] you could use p -> [2, 2, 3, 4, -1, -1, -1, -1] where the i-th index directly yields the answer to the query. This requires O(N) space per alphabet letter (O(NA) total) and also that much time during preprocessing. It is therefore not suitable for large alphabets.
+
+An optimal O(N + L) approach for any alphabet
+Instead of processing the words one at a time, we will process all words simultaneously.
+
+First, for each word w in D, create a 2-tuple containing w and the number 0 (i.e. (w, 0)). The number refers to the number of characters in w that have already been found in S; initially, no characters have been found. For a tuple t, we'll refer to the word as t.w, and to the number as t.i (since it is an index).
+
+Group the words by t.w[t.i] (initially t.i is 0, so initially it is by first letter). For our example dictionary D = {"able", "ale", "apple", "bale", "kangaroo"}, we’ll have:
+
+Copy
+a -> [("able", 0), ("ale", 0), ("apple", 0)]
+b -> [("bale", 0)]
+k -> [("kangaroo", 0)]
+    
+What this is doing is telling you what words you will make progress on finding for each possible letter that you might see next in S.
+
+Scan S one character at a time. If the character you just scanned is c, for each tuple t in map[c], increment t.i by 1 and transfer t to map[t.w[t.i]]. The case where t.i == t.w.length is special - transfer these words to a "found" list. In the end, the output is the longest word in the found list.

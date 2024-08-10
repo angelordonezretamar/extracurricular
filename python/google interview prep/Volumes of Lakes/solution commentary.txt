@@ -1,0 +1,27 @@
+Using the Dijkstra algorithm, which finds the shortest paths between nodes in a graph
+Consider a function f(x) which for a node x tells you what the water level is for that node (if you subtract the height h(x) at that point and integrate over the whole are then you have the answer)
+
+Now f(x) = min_{path p from x to answer sinkhole} max_{q in p} h(q)
+
+So this is a version of the Dijkstra algorithm using the edge weight max instead of the usual sum.
+
+O(N) Solution: Scan left to right, then right to left
+Overall strategy: We make use of the fact that every graph consists of an uphill section, and a downhill section. A single pass will only work on an "uphill" section of the graph. So we solve the left uphill portion with a left to right scan, and then reverse direction to solve the right downhill section with a right to left pass, thus turning the downhill section into an uphill section.
+
+First pass: Scan left to right keeping track of maximum possible water level. Each time a bar greater than or equal to the height of the water level is found, accumulate the lake so far, and update the water level. If no such bar >= the waterlevel is found, do not accumulate the lake. The final bar will always constitute such a condition. The first pass finds the volume of the lakes to the left of the rightmost bar of max height. Record the position of the final max height bar (to the right of which there exists no bar of greater or equal height).
+
+Second pass: We now iterate from right to left (keep the running total from before). We already know the total volume of the lakes identified in the first pass. On the second pass, we find the volume of the remaining lakes.
+
+The second pass terminates when we reach the final max height bar from the 1st pass. Take care to accumulate the final lake.
+
+This approach breaks the tracking of “interesting” columns into a separate step. Doing that costs more time, but might well make for more-readable code.
+
+Walk in from the left edge and the right edge simultaneously.
+This approach relies on always knowing that the leftmost (rightmost) edge we’re looking at *must* be on the low side of any basin. Then alternatively work either the left side or the right side towards the middle depending on which one is lower, so as to preserve that invariant.
+
+When left meets or crosses right, we’re done.
+
+Testing suggestions
+As with solving any coding problem, get in the habit of running tests on your code, to both find bugs and optimize
+Possible base case tests: lakes shaped like bowls v. buckets, lakes with uneven sides, ranges at the end(s) that hold no water
+Possible pathological case tests: terrain that only increases or decreases (i.e. slopes with no lakes), uniformly level terrain, 1 or 2 bars total

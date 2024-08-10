@@ -1,0 +1,28 @@
+The straightforward solution for all permutations of length K is:
+O(K^2 * N! / (N-K)!) = O(K^2 * nCr(N,K) * K!).
+
+Involves either recursion or record-keeping but there are no “tricks”.
+
+The optimal solution(s) can be arrived at through reasoning and progressively; there is no “ah ha” moment. Great practice at starting with a working but non-optimal solution and progressively make improvements.
+
+Here are some great questions to ask as you solve the problem:
+
+Is the input list sorted? -> no (but you can sort it, leading to an optimal solution)
+Do all the words in the input have the same length? -> not necessarily. More importantly, how does thinking about this question help you?
+Areas where people often struggle:
+
+Not checking that all rows are length K.
+Overflowing bounds: doing v[r][c] == v[c][r] before checking v[c].size().
+Checking things twice (optimization: no need to check both i,j and j,i)
+Not thinking about how to handle length 0 or 1 input.
+Not including a word more than once: THAT, HASH, ASIA, FOOL (THAT could go at end). This is an important edge case to consider -- and solving for it makes the problem slightly more complicated.
+An alternative solution:
+Running a backtracking algorithm with a trie T and an array P of k pointers.
+
+At any given point, we have filled in r rows and columns ( per the problem's constraint). And this point, we are left with a (k - r) sized square to fill. We could use the last (k - r) pointers in P to explore the trie.
+
+Say now that the running time of the algorithm is T(N, k), where N is the number of words given in the input. We could write
+
+T(N, k) = N * (T(N - 1, k - 1) + k), because for each word that we try out, we will have to adjust the k pointers, and there are N words in total. Once we have put in the first word, we are left with N - 1 words and a square of size (k - 1) to fill.
+
+Also, T(p, 1) = p * k^2, because if we are left with a square of size 1, and have p potential characters to fill there, we would fill them in one by one, and print out the entire word square. This will be where our recursion terminates.

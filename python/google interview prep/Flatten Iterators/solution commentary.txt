@@ -1,0 +1,33 @@
+Here are some possible solutions:
+
+Less Efficient Solution - O(k) operations
+Initialize by iterating over the nested iterators, adding them to a member list or array (linked list is fine).
+
+Have a helper to move to the next iterator that can provide the next element. This can be called in both hasNext() and next(). Helper should only go through each nested iterator once (no more elements if it goes a full cycle without finding anything)
+
+To interleave you have to hold on to references to all the inner Iterators (i.e. all the iterators returned by the outer Iterator) in order to be able to revisit the first one once you reach the last one. This is correct for the ones for which hasNext() is true. So the solution must use a data structure from which you can prune the empties.
+
+This requires maintaining a bit more state than just the collection of iterators. A common solution is to store all the iterators in a List, then when it hits the end of the list, wrap back until each iterator is expired. If you hit an iterator that is expired (.hasNext() returns false), you can skip over it.
+
+More Efficient Solution - O(1) operations, O(k) initialization
+Don't add an iterator to the iterator list upon initialization if it’s empty. If an iterator does not have any more elements, remove it from the list. This will also simplify the helper method by not having to keep track of a cycle.
+
+Note that for this to be O(1) for next() then getting the next iterator and removing it must also be O(1) - using a linked list for storage and its iterator (a new one for each cycle) for getting and removal is one possibility.
+
+Another possibility is a queue, where you only add an iterator back to the end of the queue if it has more elements.
+
+The Queue (generally more optimal)
+Use the queue to do the cycling of the list for you. When you pull an element from an iterator, check to see if the iterator is empty. If the iterator is not empty, add it back to the queue. If it’s empty, then you’re out of elements.
+
+If done correctly, this is a slightly easier version of Solution 2 to write, as it leverages existing data structures to do most of the abstraction for you.
+
+Assumes:
+
+k iterators
+w elements / iterator
+n total elements
+implementation (assuming O(1) pop), this should be:
+
+O(k) constructor
+O(1) next
+O(1) hasNext
